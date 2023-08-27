@@ -1,0 +1,181 @@
+use regex::Regex;
+
+const H1: &str = "# ";
+const H2: &str = "## ";
+const H3: &str = "### ";
+const H4: &str = "#### ";
+const H5: &str = "##### ";
+const H6: &str = "###### ";
+const LIST_BULLET: &str = "* ";
+const BLOCKQUOTE: &str = "> ";
+
+const BACKTICKS: &str = "```";
+
+const BOLD_TEXT: (&str, &str) = (r"\*\*([0-9A-Za-z]+)\*\*", r"<b>$1</b>");
+const ITALIC_TEXT: (&str, &str) = (r"\*([0-9A-Za-z]+)\*", r"<i>$1</i>");
+const ITALIC_TEXT_2: (&str, &str) = (r"_([0-9A-Za-z]+)_", r"<i>$1</i>");
+
+const BLOCK_ELEMENTS: &[&str] = &[BACKTICKS];
+const LINE_ELEMENTS: &[&str] = &[H1, H2, H3, H4, H5, H6, LIST_BULLET, BLOCKQUOTE];
+const STYLE_ELEMENTS: &[(&str, &str)] = &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2];
+
+pub struct Parser {}
+
+impl Parser {
+    pub fn parse_md(lines: Vec<&str>) -> String {
+        let mut html_str = String::new();
+        let mut in_a_block = false;
+        for line in lines {
+            if Parser::is_block_element(line) {
+                // in block ? assume no nesting for now
+                in_a_block = !in_a_block;
+                continue;
+            }
+
+            if !in_a_block {
+                let mut html_line: String;
+                if Parser::is_line_element(line) {
+                    html_line = format!("{}", &Parser::parse_line(line));
+                } else if line == "" {
+                    html_line = "".to_string();
+                } else {
+                    html_line = format!("<span>{}</span>", line);
+                }
+                for (style_re, replace) in STYLE_ELEMENTS {
+                    let re = Regex::new(style_re).unwrap();
+                    html_line = re.replace_all(&html_line, *replace).to_string();
+                }
+                html_str += &format!("{}\n", html_line);
+            }
+        }
+        html_str
+    }
+
+    fn is_line_element(line: &str) -> bool {
+        for el in LINE_ELEMENTS {
+            if line.starts_with(el) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    fn is_block_element(line: &str) -> bool {
+        for el in BLOCK_ELEMENTS {
+            if line.starts_with(el) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    fn parse_line(line: &str) -> String {
+        if line.starts_with(H1) {
+            let content = line.split_once(H1).unwrap();
+            return format!("<h1>{}</h1>", content.1);
+        } else if line.starts_with(H2) {
+            let content = line.split_once(H2).unwrap();
+            return format!("<h2>{}</h2>", content.1);
+        } else if line.starts_with(H3) {
+            let content = line.split_once(H3).unwrap();
+            return format!("<h3>{}</h3>", content.1);
+        } else if line.starts_with(H4) {
+            let content = line.split_once(H4).unwrap();
+            return format!("<h4>{}</h4>", content.1);
+        } else if line.starts_with(H5) {
+            let content = line.split_once(H5).unwrap();
+            return format!("<h5>{}</h5>", content.1);
+        } else if line.starts_with(H6) {
+            let content = line.split_once(H6).unwrap();
+            return format!("<h6>{}</h6>", content.1);
+        } else if line.starts_with(LIST_BULLET) {
+            let content = line.split_once(LIST_BULLET).unwrap();
+            return format!("<li>{}</li>", content.1);
+        } else if line.starts_with(BLOCKQUOTE) {
+            let content = line.split_once(BLOCKQUOTE).unwrap();
+            return format!("<blockquote>{}</blockquote>", content.1);
+        }
+        return String::new();
+    }
+}
+
+#[cfg(test)]
+mod parser_tests {
+    use super::*;
+    #[test]
+    fn parse_md() {
+        let content = "\
+        # this is an h1
+        ## this is an h2
+        ### this is an h3
+        #### this is an h4
+        ##### this is an h5
+        ###### this is an h6
+        * this is a li
+        > this is a blockquote
+        this is nothing
+        "
+        .lines()
+        .map(|l| l.trim())
+        .collect();
+        let html_str = Parser::parse_md(content);
+        let expected_html = "\
+        <h1>this is an h1</h1>
+        <h2>this is an h2</h2>
+        <h3>this is an h3</h3>
+        <h4>this is an h4</h4>
+        <h5>this is an h5</h5>
+        <h6>this is an h6</h6>
+        <li>this is a li</li>
+        <blockquote>this is a blockquote</blockquote>
+        <span>this is nothing</span>
+        "
+        .lines()
+        .map(|l| l.trim_start())
+        .fold(String::new(), |acc, e| acc + e + "\n");
+        assert_eq!(expected_html, html_str);
+    }
+    #[test]
+    fn parse_line_h1() {
+        let html = Parser::parse_line("# this is an h1");
+        assert_eq!("<h1>this is an h1</h1>", html);
+    }
+
+    #[test]
+    fn parse_line_h2() {
+        let html = Parser::parse_line("## this is an h2");
+        assert_eq!("<h2>this is an h2</h2>", html);
+    }
+    #[test]
+    fn parse_line_h3() {
+        let html = Parser::parse_line("### this is an h3");
+        assert_eq!("<h3>this is an h3</h3>", html);
+    }
+    #[test]
+    fn parse_line_h4() {
+        let html = Parser::parse_line("#### this is an h4");
+        assert_eq!("<h4>this is an h4</h4>", html);
+    }
+    #[test]
+    fn parse_line_h5() {
+        let html = Parser::parse_line("##### this is an h5");
+        assert_eq!("<h5>this is an h5</h5>", html);
+    }
+    #[test]
+    fn parse_line_h6() {
+        let html = Parser::parse_line("###### this is an h6");
+        assert_eq!("<h6>this is an h6</h6>", html);
+    }
+
+    #[test]
+    fn parse_line_bullet_point() {
+        let html = Parser::parse_line("* this is an li");
+        assert_eq!("<li>this is an li</li>", html);
+    }
+
+    #[test]
+    fn parse_line_blockquote() {
+        let html = Parser::parse_line("> this is a blockquote");
+        assert_eq!("<blockquote>this is a blockquote</blockquote>", html);
+    }
+}
