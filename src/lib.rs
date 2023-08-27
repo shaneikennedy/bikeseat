@@ -47,7 +47,7 @@ impl Parser {
                 } else if line == "" {
                     html_line = "".to_string();
                 } else {
-                    html_line = format!("<span>{}</span>", line);
+                    html_line = format!("<div>{}</div>", line);
                 }
                 for (style_re, replace) in STYLE_ELEMENTS {
                     let re = Regex::new(style_re).unwrap();
@@ -138,7 +138,7 @@ mod parser_tests {
         <h6>this is an h6</h6>
         <li>this is a li</li>
         <blockquote>this is a blockquote</blockquote>
-        <span>this is nothing</span>
+        <div>this is nothing</div>
         "
         .lines()
         .map(|l| l.trim_start())
