@@ -14,10 +14,11 @@ const BACKTICKS: &str = "```";
 const BOLD_TEXT: (&str, &str) = (r"\*\*([0-9A-Za-z]+)\*\*", r"<b>$1</b>");
 const ITALIC_TEXT: (&str, &str) = (r"\*([0-9A-Za-z]+)\*", r"<i>$1</i>");
 const ITALIC_TEXT_2: (&str, &str) = (r"_([0-9A-Za-z]+)_", r"<i>$1</i>");
+const CODE: (&str, &str) = (r"`([A-Za-z0-9 ~-]+)`", r"<code>$1</code>");
 
 const BLOCK_ELEMENTS: &[&str] = &[BACKTICKS];
 const LINE_ELEMENTS: &[&str] = &[H1, H2, H3, H4, H5, H6, LIST_BULLET, BLOCKQUOTE];
-const STYLE_ELEMENTS: &[(&str, &str)] = &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2];
+const STYLE_ELEMENTS: &[(&str, &str)] = &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2, CODE];
 
 pub struct Parser {}
 
@@ -25,9 +26,16 @@ impl Parser {
     pub fn parse_md(lines: Vec<&str>) -> String {
         let mut html_str = String::new();
         let mut in_a_block = false;
+        let mut block_html = String::new();
         for line in lines {
             if Parser::is_block_element(line) {
-                // in block ? assume no nesting for now
+                if !in_a_block {
+                    block_html += "<code>"; // implement find block type
+                } else {
+                    block_html += "</code>";
+                    html_str += &format!("{}\n", block_html);
+                    block_html = String::new();
+                }
                 in_a_block = !in_a_block;
                 continue;
             }
@@ -46,6 +54,8 @@ impl Parser {
                     html_line = re.replace_all(&html_line, *replace).to_string();
                 }
                 html_str += &format!("{}\n", html_line);
+            } else {
+                block_html += &format!("<div>{}</div>", line);
             }
         }
         html_str
