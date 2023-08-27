@@ -15,10 +15,18 @@
             background-color: #f1f1f1 !important;
             padding: 2px;
         }
+        blockquote {
+            padding: 0 0 0 1.5rem;
+            border-left: 0.25rem solid #a5d7e8;
+            margin: 1rem;
+        }
+        body {
+            margin: 10%;
+        }
     </style>
 </head>
 
-<body class="container">
+<body>
 {{ html_template }}
 </body>
 </html>
