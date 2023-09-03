@@ -2,11 +2,13 @@ use std::fs;
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
+use std::str::from_utf8;
 use std::thread;
 use std::time::Duration;
 
 use md::Renderer;
 use md::ThreadPool;
+use regex::Regex;
 
 fn main() {
     bootstrap_content();
@@ -46,19 +48,19 @@ fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
 
-    let get = b"GET / HTTP/1.1\r\n";
-    let sleep = b"GET /sleep HTTP/1.1\r\n";
-
-    let (status_line, filename) = if buffer.starts_with(get) {
-        ("HTTP/1.1 200 OK", "hello.html")
-    } else if buffer.starts_with(sleep) {
-        thread::sleep(Duration::from_secs(5));
-        ("HTTP/1.1 200 OK", "hello.html")
+    let home = b"GET / HTTP/1.1\r\n";
+    let re = Regex::new(r"GET /(?P<route>[a-zA-Z0-9-]+) HTTP/1.1\r\n").unwrap();
+    let req = from_utf8(&buffer).unwrap();
+    let (status_line, filename) = if buffer.starts_with(home) {
+        ("HTTP/1.1 200 OK", "index")
+    } else if re.is_match(req) {
+        let route = re.captures(req).unwrap().name("route").unwrap().as_str();
+        ("HTTP/1.1 200 OK", route)
     } else {
-        ("HTTP/1.1 404 NOT FOUND", "404.html")
+        ("HTTP/1.1 404 NOT FOUND", "404")
     };
 
-    let contents = fs::read_to_string(filename).unwrap();
+    let contents = fs::read_to_string(format!("out/{}.html", filename)).unwrap();
 
     let response = format!(
         "{}\r\nContent-Length: {}\r\n\r\n{}",
