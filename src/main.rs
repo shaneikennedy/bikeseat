@@ -57,10 +57,13 @@ fn handle_connection(mut stream: TcpStream) {
         let route = re.captures(req).unwrap().name("route").unwrap().as_str();
         ("HTTP/1.1 200 OK", route)
     } else {
-        ("HTTP/1.1 404 NOT FOUND", "404")
+        ("HTTP/1.1 404 NOT FOUND", "static/404.html")
     };
 
-    let contents = fs::read_to_string(format!("out/{}.html", filename)).unwrap();
+    let contents = match fs::read_to_string(format!("out/{}.html", filename)) {
+        Ok(file) => file,
+        Err(_) => fs::read_to_string("static/404.html").unwrap(),
+    };
 
     let response = format!(
         "{}\r\nContent-Length: {}\r\n\r\n{}",
