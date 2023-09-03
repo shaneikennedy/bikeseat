@@ -3,8 +3,6 @@ use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::str::from_utf8;
-use std::thread;
-use std::time::Duration;
 
 use md::Renderer;
 use md::ThreadPool;
