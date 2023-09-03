@@ -1,4 +1,5 @@
 use regex::Regex;
+use std::fs;
 
 const H1: &str = "# ";
 const H2: &str = "## ";
@@ -187,5 +188,31 @@ mod parser_tests {
     fn parse_line_blockquote() {
         let html = Parser::parse_line("> this is a blockquote");
         assert_eq!("<blockquote>this is a blockquote</blockquote>", html);
+    }
+}
+
+pub struct Renderer {}
+
+impl Renderer {
+    pub fn render_home(posts: Vec<String>) {
+        let mut html_str = String::new();
+        for post in posts {
+            html_str += &format!("<li><a href='{}.html'>{}</a></li>\n", post, post);
+        }
+        let template = fs::read_to_string("templates/index.template.html").unwrap();
+        let content = template.as_str().replace("{{ html_template }}", &html_str);
+        let out_file = "out/index.html";
+        fs::write(out_file, content).expect("unable to write to index.html");
+    }
+
+    pub fn render_post(post: String) {
+        let markdown: String =
+            fs::read_to_string(format!("content/{}", post.clone())).expect("could not read file.");
+        let html_str = Parser::parse_md(markdown.lines().map(|l| l.trim()).collect());
+        let template = fs::read_to_string("templates/post.template.html").unwrap();
+        let content = template.as_str().replace("{{ html_template }}", &html_str);
+        let out_file = &format!("out/{}.html", post);
+        fs::write(out_file, content).expect("unable to write to index.html");
+        println!("Successfully generated {}", out_file.clone());
     }
 }
