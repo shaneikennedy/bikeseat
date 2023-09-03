@@ -201,7 +201,8 @@ impl Renderer {
     pub fn render_home(posts: Vec<String>) {
         let mut html_str = String::new();
         for post in posts {
-            html_str += &format!("<li><a href='{}.html'>{}</a></li>\n", post, post);
+            let post_name = post.split(".").nth(0).unwrap();
+            html_str += &format!("<li><a href='{}'>{}</a></li>\n", post_name, post_name);
         }
         let template = fs::read_to_string("templates/index.template.html").unwrap();
         let content = template.as_str().replace("{{ html_template }}", &html_str);
@@ -215,7 +216,7 @@ impl Renderer {
         let html_str = Parser::parse_md(markdown.lines().map(|l| l.trim()).collect());
         let template = fs::read_to_string("templates/post.template.html").unwrap();
         let content = template.as_str().replace("{{ html_template }}", &html_str);
-        let out_file = &format!("out/{}.html", post);
+        let out_file = &format!("out/{}.html", post.split(".").nth(0).unwrap());
         fs::write(out_file, content).expect("unable to write to index.html");
         println!("Successfully generated {}", out_file.clone());
     }
