@@ -128,11 +128,10 @@ mod parser_tests {
         ###### this is an h6
         * this is a li
         > this is a blockquote
-        this is nothing
-        "
-        .lines()
-        .map(|l| l.trim())
-        .collect();
+        this is nothing"
+            .lines()
+            .map(|l| l.trim())
+            .collect();
         let html_str = Parser::parse_md(content);
         let expected_html = "\
         <h1>this is an h1</h1>
@@ -143,11 +142,10 @@ mod parser_tests {
         <h6>this is an h6</h6>
         <li>this is a li</li>
         <blockquote>this is a blockquote</blockquote>
-        <div>this is nothing</div>
-        "
-        .lines()
-        .map(|l| l.trim_start())
-        .fold(String::new(), |acc, e| acc + e + "\n");
+        <div>this is nothing</div>"
+            .lines()
+            .map(|l| l.trim_start())
+            .fold(String::new(), |acc, e| acc + e + "\n");
         assert_eq!(expected_html, html_str);
     }
     #[test]
