@@ -50,7 +50,7 @@ impl Parser {
                 if Parser::is_line_element(line) {
                     html_line = format!("{}", &Parser::parse_line(line));
                 } else if line == "" {
-                    html_line = "".to_string();
+                    html_line = "<br>".to_string();
                 } else {
                     html_line = format!("<div>{}</div>", line);
                 }
