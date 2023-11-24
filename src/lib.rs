@@ -20,10 +20,14 @@ const BOLD_TEXT: (&str, &str) = (r"\*\*([0-9A-Za-z]+)\*\*", r"<b>$1</b>");
 const ITALIC_TEXT: (&str, &str) = (r"\*([0-9A-Za-z]+)\*", r"<i>$1</i>");
 const ITALIC_TEXT_2: (&str, &str) = (r"_([0-9A-Za-z]+)_", r"<i>$1</i>");
 const CODE: (&str, &str) = (r"`([A-Za-z0-9 ~-]+)`", r"<code>$1</code>");
+const ANCHOR: (&str, &str) = (
+    r"\[([\s\S]+)\]\(([A-Za-z0-9 ~\-:\/.]+)\)",
+    r#"<a href="$2">$1</a>"#,
+);
 
 const BLOCK_ELEMENTS: &[&str] = &[BACKTICKS];
 const LINE_ELEMENTS: &[&str] = &[H1, H2, H3, H4, H5, H6, LIST_BULLET, BLOCKQUOTE];
-const STYLE_ELEMENTS: &[(&str, &str)] = &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2, CODE];
+const STYLE_ELEMENTS: &[(&str, &str)] = &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2, CODE, ANCHOR];
 
 pub struct Parser {}
 
@@ -55,8 +59,7 @@ impl Parser {
                     html_line = format!("<div>{}</div>", line);
                 }
                 for (style_re, replace) in STYLE_ELEMENTS {
-                    let re = Regex::new(style_re).unwrap();
-                    html_line = re.replace_all(&html_line, *replace).to_string();
+                    html_line = Parser::format_line(&html_line, style_re, replace);
                 }
                 html_str += &format!("{}\n", html_line);
             } else {
@@ -82,6 +85,11 @@ impl Parser {
             }
         }
         return false;
+    }
+
+    fn format_line(line: &str, regex: &&str, replace: &&str) -> String {
+        let re = Regex::new(regex).unwrap();
+        re.replace_all(&line, *replace).to_string()
     }
 
     fn parse_line(line: &str) -> String {
@@ -190,6 +198,12 @@ mod parser_tests {
     fn parse_line_blockquote() {
         let html = Parser::parse_line("> this is a blockquote");
         assert_eq!("<blockquote>this is a blockquote</blockquote>", html);
+    }
+
+    #[test]
+    fn format_anchor_tag() {
+        let html = Parser::format_line("[hello world!](https://google.com)", &ANCHOR.0, &ANCHOR.1);
+        assert_eq!("<a href=\"https://google.com\">hello world!</a>", html);
     }
 }
 
