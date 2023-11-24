@@ -8,3 +8,9 @@ A learning exercise to see if I can replace my own blog [JuniorDeveloperDiaries]
 - Write the markdown parser from scratch, no libraries, and convert it to html that looks as bad as https://juniordeveloperdiaries does
 - Actual CI/CD, not to the level of Netlify, but good enough. I never use the preview feature for Netlify anyways.
 - Get real analytics, I don't want to pay $14/month or whatever it is for Netlify, and google analytics is particularly poorly suited for a community where 90% of the users probably have a tracking/ad-blocker.
+
+## Current state
+This project's progress will be representative of the bikeseat image below
+<p align="center">
+  <img src="musty-bikeseat.jpeg" alt="Musty old bikeseat"/>
+</p>
