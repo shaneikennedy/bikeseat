@@ -20,13 +20,26 @@
             border-left: 0.25rem solid #a5d7e8;
             margin: 1rem;
         }
-        body {
-            margin: 10%;
+        img {
+            width: 60%;
+            height: 40%;
+        }
+        div {
+            display: block;
+            margin: auto;
+            width: 80%;
+        }
+        div img {
+            display: block;
+            margin: auto;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-{{ html_template }}
+  <div>
+    {{ html_template }}
+  </div>
 </body>
 </html>

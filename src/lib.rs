@@ -40,9 +40,9 @@ impl Parser {
         for line in lines {
             if Parser::is_block_element(line) {
                 if !in_a_block {
-                    block_html += "<code>"; // implement find block type
+                    block_html += "<div><code>"; // implement find block type
                 } else {
-                    block_html += "</code>";
+                    block_html += "</code></div>";
                     html_str += &format!("{}\n", block_html);
                     block_html = String::new();
                 }
@@ -53,7 +53,7 @@ impl Parser {
             if !in_a_block {
                 let mut html_line: String;
                 if Parser::is_line_element(line) {
-                    html_line = format!("{}", &Parser::parse_line(line));
+                    html_line = format!("<div>{}</div>", &Parser::parse_line(line));
                 } else if line == "" {
                     html_line = "<br>".to_string();
                 } else {
@@ -62,7 +62,7 @@ impl Parser {
                 for (style_re, replace) in STYLE_ELEMENTS {
                     html_line = Parser::format_line(&html_line, style_re, replace);
                 }
-                html_str += &format!("{}\n", html_line);
+                html_str += &format!("<div>{}</div>", html_line);
             } else {
                 block_html += &format!("<div>{}</div>", line);
             }
