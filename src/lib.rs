@@ -20,10 +20,15 @@ const ANCHOR: (&str, &str) = (
     r"\[([\s\S]+)\]\(([A-Za-z0-9 ~\-:\/.]+)\)",
     r#"<a href="$2">$1</a>"#,
 );
+const IMAGE: (&str, &str) = (
+    r"!\[([\s\S]+)\]\(([A-Za-z0-9 ~\-:\/.]+)\)",
+    r#"<img src="$2" alt="$1">"#,
+);
 
 const BLOCK_ELEMENTS: &[&str] = &[BACKTICKS];
 const LINE_ELEMENTS: &[&str] = &[H1, H2, H3, H4, H5, H6, LIST_BULLET, BLOCKQUOTE];
-const STYLE_ELEMENTS: &[(&str, &str)] = &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2, CODE, ANCHOR];
+const STYLE_ELEMENTS: &[(&str, &str)] =
+    &[BOLD_TEXT, ITALIC_TEXT, ITALIC_TEXT_2, CODE, IMAGE, ANCHOR];
 
 pub struct Parser {}
 
@@ -200,6 +205,12 @@ mod parser_tests {
     fn format_anchor_tag() {
         let html = Parser::format_line("[hello world!](https://google.com)", &ANCHOR.0, &ANCHOR.1);
         assert_eq!("<a href=\"https://google.com\">hello world!</a>", html);
+    }
+
+    #[test]
+    fn format_img() {
+        let html = Parser::format_line("![alt](image-url)", &IMAGE.0, &IMAGE.1);
+        assert_eq!("<img src=\"image-url\" alt=\"alt\">", html);
     }
 }
 
