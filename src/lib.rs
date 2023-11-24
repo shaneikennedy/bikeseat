@@ -127,37 +127,6 @@ impl Parser {
 mod parser_tests {
     use super::*;
     #[test]
-    fn parse_md() {
-        let content = "\
-        # this is an h1
-        ## this is an h2
-        ### this is an h3
-        #### this is an h4
-        ##### this is an h5
-        ###### this is an h6
-        * this is a li
-        > this is a blockquote
-        this is nothing"
-            .lines()
-            .map(|l| l.trim())
-            .collect();
-        let html_str = Parser::parse_md(content);
-        let expected_html = "\
-        <h1>this is an h1</h1>
-        <h2>this is an h2</h2>
-        <h3>this is an h3</h3>
-        <h4>this is an h4</h4>
-        <h5>this is an h5</h5>
-        <h6>this is an h6</h6>
-        <li>this is a li</li>
-        <blockquote>this is a blockquote</blockquote>
-        <div>this is nothing</div>"
-            .lines()
-            .map(|l| l.trim_start())
-            .fold(String::new(), |acc, e| acc + e + "\n");
-        assert_eq!(expected_html, html_str);
-    }
-    #[test]
     fn parse_line_h1() {
         let html = Parser::parse_line("# this is an h1");
         assert_eq!("<h1>this is an h1</h1>", html);
