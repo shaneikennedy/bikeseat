@@ -12,10 +12,10 @@ const BLOCKQUOTE: &str = "> ";
 
 const BACKTICKS: &str = "```";
 
-const BOLD_TEXT: (&str, &str) = (r"\*\*([0-9A-Za-z]+)\*\*", r"<b>$1</b>");
-const ITALIC_TEXT: (&str, &str) = (r"\*([0-9A-Za-z]+)\*", r"<i>$1</i>");
-const ITALIC_TEXT_2: (&str, &str) = (r"_([0-9A-Za-z]+)_", r"<i>$1</i>");
-const CODE: (&str, &str) = (r"`([A-Za-z0-9 ~-]+)`", r"<code>$1</code>");
+const BOLD_TEXT: (&str, &str) = (r"\*\*([\s\S]+)\*\*", r"<b>$1</b>");
+const ITALIC_TEXT: (&str, &str) = (r"\*([\s\S]+)\*", r"<i>$1</i>");
+const ITALIC_TEXT_2: (&str, &str) = (r"_([\s\S]+)_", r"<i>$1</i>");
+const CODE: (&str, &str) = (r"`([\s a-zA-z0-9<>\\/~-]+)`", r"<code>$1</code>");
 const ANCHOR: (&str, &str) = (
     r"\[([\s\S]+)\]\(([A-Za-z0-9 ~\-:\/.]+)\)",
     r#"<a href="$2">$1</a>"#,
@@ -205,6 +205,42 @@ mod parser_tests {
     fn format_anchor_tag() {
         let html = Parser::format_line("[hello world!](https://google.com)", &ANCHOR.0, &ANCHOR.1);
         assert_eq!("<a href=\"https://google.com\">hello world!</a>", html);
+    }
+
+    #[test]
+    fn format_italic_text() {
+        let html = Parser::format_line("*hello*", &ITALIC_TEXT.0, &ITALIC_TEXT.1);
+        assert_eq!("<i>hello</i>", html);
+    }
+
+    #[test]
+    fn format_italic_text2() {
+        let html = Parser::format_line("_hello_", &ITALIC_TEXT_2.0, &ITALIC_TEXT_2.1);
+        assert_eq!("<i>hello</i>", html);
+    }
+
+    #[test]
+    fn format_inline_code() {
+        let html = Parser::format_line("`hello`", &CODE.0, &CODE.1);
+        assert_eq!("<code>hello</code>", html);
+    }
+
+    #[test]
+    fn format_bold_text() {
+        let html = Parser::format_line("**hello**", &BOLD_TEXT.0, &BOLD_TEXT.1);
+        assert_eq!("<b>hello</b>", html);
+    }
+
+    #[test]
+    fn format_bold_italic_anchor_text() {
+        let mut html_line: String = "***[hello](https://google.com)***".to_string();
+        for (style_re, replace) in STYLE_ELEMENTS {
+            html_line = Parser::format_line(&html_line, style_re, replace);
+        }
+        assert_eq!(
+            "<b><i><a href=\"https://google.com\">hello</a></i></b>",
+            html_line
+        );
     }
 
     #[test]
