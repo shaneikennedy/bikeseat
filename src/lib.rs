@@ -238,7 +238,7 @@ impl Renderer {
             let desc = title_description[1];
             let post_name = post.split(".").nth(0).unwrap();
             html_str += &format!(
-                "<div><a href='{}'>{}</a><span>{}</span></div>\n",
+                "<div><h2><a href='{}'>{}</a></h2><p>{}</p></div>\n",
                 post_name,
                 title.split(":").nth(1).unwrap(),
                 desc.split(":").nth(1).unwrap()
