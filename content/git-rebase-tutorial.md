@@ -1,3 +1,7 @@
+---
+Description: Learn how to git rebase interactively
+Title: Interactive git rebase
+---
 # Learn how to harness the power of git's interactive rebase, a command that let's you alter the commit history with full control
 
 Imagine you have *this* feature _branch_ with 5 **commits**:

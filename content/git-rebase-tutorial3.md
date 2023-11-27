@@ -1,3 +1,7 @@
+---
+Description: Learn how to git rebase interactively
+Title: Interactive git rebase
+---
 # Learn how to harness the power of git's interactive rebase, a command that let's you alter the commit history with full control
 
 ![altttt](http://localhost:7878/static/screen-shot.png)

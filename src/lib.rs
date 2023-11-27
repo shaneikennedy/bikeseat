@@ -33,10 +33,16 @@ const STYLE_ELEMENTS: &[(&str, &str)] =
 pub struct Parser {}
 
 impl Parser {
-    pub fn parse_md(lines: Vec<&str>) -> String {
+    pub fn parse_md(mut lines: Vec<&str>) -> String {
         let mut html_str = String::new();
         let mut in_a_block = false;
         let mut block_html = String::new();
+        // Remove first four lines
+        lines.remove(0);
+        lines.remove(0);
+        lines.remove(0);
+        lines.remove(0);
+        // end
         for line in lines {
             if Parser::is_block_element(line) {
                 if !in_a_block {
@@ -225,8 +231,18 @@ impl Renderer {
     pub fn render_home(posts: Vec<String>) {
         let mut html_str = String::new();
         for post in posts {
+            let markdown: String = fs::read_to_string(format!("content/{}", post.clone()))
+                .expect("could not read file.");
+            let title_description: Vec<&str> = markdown.lines().take(4).collect();
+            let title = title_description[2];
+            let desc = title_description[1];
             let post_name = post.split(".").nth(0).unwrap();
-            html_str += &format!("<li><a href='{}'>{}</a></li>\n", post_name, post_name);
+            html_str += &format!(
+                "<div><a href='{}'>{}</a><span>{}</span></div>\n",
+                post_name,
+                title.split(":").nth(1).unwrap(),
+                desc.split(":").nth(1).unwrap()
+            );
         }
         let template = fs::read_to_string("templates/index.template.html").unwrap();
         let content = template.as_str().replace("{{ html_template }}", &html_str);
