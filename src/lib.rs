@@ -238,7 +238,11 @@ impl Renderer {
             let desc = title_description[1];
             let post_name = post.split(".").nth(0).unwrap();
             html_str += &format!(
-                "<div><h2><a href='{}'>{}</a></h2><p>{}</p></div>\n",
+                "<div class='post'>
+                <h2><a class='post-link' href='{}'>{}</a></h2>
+                <p>{}</p>
+                <p class='date'>Published on March 13, 2024</p>
+                </div>",
                 post_name,
                 title.split(":").nth(1).unwrap(),
                 desc.split(":").nth(1).unwrap()
