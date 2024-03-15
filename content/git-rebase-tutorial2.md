@@ -2,11 +2,12 @@
 Description: Learn how to git rebase interactively
 Title: Interactive git rebase
 ---
-# Learn how to harness the power of git's interactive rebase, a command that let's you alter the commit history with full control
 
-Imagine you have *this* feature _branch_ with 5 **commits**:
+## Learn how to harness the power of git's interactive rebase, a command that let's you alter the commit history with full control
 
-``` text
+Imagine you have _this_ feature _branch_ with 5 **commits**:
+
+```text
 * 02a7e84ccee - (HEAD -> billing, origin/billing) Fail gracefully if unknown error (8 hours ago)
 * 8647daf1a2f -  Add R0801 to pylint ignore list (8 hours ago)
 * 1c5d459147a -  Don't use BaseException anywhere (8 hours ago)
@@ -24,15 +25,16 @@ You've put the work in to reflect incremental units of change, each with their o
 What we could do is create a commit that fixes the typo, handles the edge case and adds a test called "Update with PR feedback", but I'm here to tell you that we can do better than that. A commit that fixes mistakes that were introduced in this PR does not make any sense. In the git history we would just prefer that these mistakes never existed at all. So let me propose a different way:
 
 Let's add a new commit for each fix we make
-* Fix typo
-* Handle edge case
-* Add test
 
-These are bad commit messages but you'll see why in a second. Further, let's say we know that the typo happened in  "d8d58d1f055 -  Update event service client with billing logic", the edge case was missed in "d783109d594 -  Raise insuffient data exceptions", and that you missed a test in "62de8bb854d -  Send billing events".
+- Fix typo
+- Handle edge case
+- Add test
+
+These are bad commit messages but you'll see why in a second. Further, let's say we know that the typo happened in "d8d58d1f055 - Update event service client with billing logic", the edge case was missed in "d783109d594 - Raise insuffient data exceptions", and that you missed a test in "62de8bb854d - Send billing events".
 
 So now our commit history looks like this :
 
-``` text
+```text
 * da7f3059367 - (HEAD -> billing) Add test (1 second ago)
 * e62d6fd4bab - Handle edge case (38 seconds ago)
 * 01507911dfd - Fix typo (2 minutes ago)
@@ -44,7 +46,7 @@ So now our commit history looks like this :
 * d8d58d1f055 - Update event service client with billing logic (8 hours ago)
 ```
 
-What we're going to do here is combine, or fixup, these small fixes with the commit where the problem was introduced; this means I'm going to combine  "01507911dfd - Fix typo (2 minutes ago)" with "d8d58d1f055 -  Update event service client with billing logic" and so on.
+What we're going to do here is combine, or fixup, these small fixes with the commit where the problem was introduced; this means I'm going to combine "01507911dfd - Fix typo (2 minutes ago)" with "d8d58d1f055 - Update event service client with billing logic" and so on.
 
 #### Rebase recap
 
@@ -58,7 +60,7 @@ I have 9 commits in this branch, which means the base that I want is 10 commits 
 
 `git rebase -i HEAD~9`
 
-``` text
+```text
 pick d8d58d1f055 Update event service client with billing logic
 pick d783109d594 Raise insuffient data exceptions
 pick 62de8bb854d Send billing events
@@ -104,12 +106,12 @@ This is what you should see in your git commit editor. Let me point out some int
 
 Looking at the descriptions for each command:
 
-* Pick - "use commit" this means leave it as is
-* Reword - don't like the commit message you used?
-* Edit - forgot something on this commit?
-* Squash - "meld" into previous commit (this is what we want to do)
-* Fixup - same as squash, but use the first commit's message (this is also what we want, and what we'll use because I like the commit messages I made initially)
-* ...
+- Pick - "use commit" this means leave it as is
+- Reword - don't like the commit message you used?
+- Edit - forgot something on this commit?
+- Squash - "meld" into previous commit (this is what we want to do)
+- Fixup - same as squash, but use the first commit's message (this is also what we want, and what we'll use because I like the commit messages I made initially)
+- ...
 
 You get the point, I find these first four to be the most used in my workflow but the other options are worth knowing about.
 
@@ -117,7 +119,7 @@ Back to our rebase!
 
 I want to take my small fixup commits, and "meld" them onto the commit where they were introduced:
 
-``` text
+```text
 pick cc449795730 Update event service client with billing logic
 fixup bd8222bd083 Fix typo
 pick a96ad17080a  Raise insuffient data exceptions
@@ -135,7 +137,7 @@ Now save and close the file and run `git log --graph`
 
 > --graph is a preference, use normal git log if you want
 
-``` text
+```text
 * 9857802cbb1 - (HEAD -> billing) Fail gracefully if unknown error (5 seconds ago)
 * 747321db1e0 -  Add R0801 to pylint ignore list (6 seconds ago)
 * cbd6a8442b7 -  Don't use BaseException anywhere (6 seconds ago)
