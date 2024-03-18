@@ -1,6 +1,6 @@
 use actix_files;
-use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
-use md::Renderer;
+use actix_web::{get, middleware::Logger, web, App, HttpResponse, HttpServer, Responder};
+use bikeseat::Renderer;
 use serde::Deserialize;
 use serde_yaml::{self, Error};
 use std::{fs, process::exit};
@@ -12,13 +12,15 @@ async fn main() -> std::io::Result<()> {
         exit(1);
     }
     bootstrap_content(config.unwrap());
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     HttpServer::new(|| {
         App::new()
             .service(home)
             .service(blog_post)
             .service(actix_files::Files::new("static", "./static").show_files_listing())
+            .wrap(Logger::default())
     })
-    .bind(("127.0.0.1", 7878))?
+    .bind(("0.0.0.0", 7878))?
     .run()
     .await
 }
