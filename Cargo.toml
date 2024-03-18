@@ -7,3 +7,5 @@ edition = "2021"
 regex = "1.9.4"
 actix-web = "4"
 actix-files = "0.6.2"
+serde_yaml = "0.9.33"
+serde = { version = "1.0.197", features = ["derive"] }

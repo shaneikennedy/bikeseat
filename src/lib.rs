@@ -228,7 +228,7 @@ mod parser_tests {
 pub struct Renderer {}
 
 impl Renderer {
-    pub fn render_home(posts: Vec<String>) {
+    pub fn render_home(name: String, posts: Vec<String>) {
         let mut html_str = String::new();
         for post in posts {
             let markdown: String = fs::read_to_string(format!("content/{}", post.clone()))
@@ -249,7 +249,10 @@ impl Renderer {
             );
         }
         let template = fs::read_to_string("templates/index.template.html").unwrap();
-        let content = template.as_str().replace("{{ html_template }}", &html_str);
+        let content = template
+            .as_str()
+            .replace("{{ html_template }}", &html_str)
+            .replace("{{ name }}", name.as_str());
         let out_file = "out/index.html";
         fs::write(out_file, content).expect("unable to write to index.html");
     }

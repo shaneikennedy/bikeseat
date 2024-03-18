@@ -1,11 +1,17 @@
 use actix_files;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use md::Renderer;
-use std::fs;
+use serde::Deserialize;
+use serde_yaml::{self, Error};
+use std::{fs, process::exit};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    bootstrap_content();
+    let config = Config::new();
+    if config.is_err() {
+        exit(1);
+    }
+    bootstrap_content(config.unwrap());
     HttpServer::new(|| {
         App::new()
             .service(home)
@@ -37,7 +43,30 @@ async fn home() -> impl Responder {
     HttpResponse::Ok().body(contents)
 }
 
-fn bootstrap_content() {
+#[derive(Debug, Deserialize)]
+pub struct Config {
+    name: String,
+}
+
+impl Config {
+    pub fn new() -> Result<Config, Error> {
+        let f = std::fs::File::open(".env");
+        let config: Result<Config, Error>;
+        match f {
+            Ok(f) => config = serde_yaml::from_reader(f),
+            Err(_) => config = Ok(Config::default()),
+        }
+        return config;
+    }
+
+    fn default() -> Config {
+        return Config {
+            name: "Example blog".to_string(),
+        };
+    }
+}
+
+fn bootstrap_content(config: Config) {
     let content_dir: fs::ReadDir = fs::read_dir("content").expect("Unable to read dir 'content'");
     let mut post_titles = Vec::new();
     for item in content_dir {
@@ -48,5 +77,5 @@ fn bootstrap_content() {
             post_titles.push(file_name);
         }
     }
-    Renderer::render_home(post_titles);
+    Renderer::render_home(config.name, post_titles);
 }
