@@ -3,7 +3,7 @@ use actix_web::{get, middleware::Logger, web, App, HttpResponse, HttpServer, Res
 use bikeseat::Renderer;
 use serde::Deserialize;
 use serde_yaml::{self, Error};
-use std::{fs, process::exit};
+use std::{env, fs, process::exit};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -13,6 +13,7 @@ async fn main() -> std::io::Result<()> {
     }
     bootstrap_content(config.unwrap());
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    let port = env::var("PORT").unwrap_or("7878".to_string());
     HttpServer::new(|| {
         App::new()
             .service(home)
@@ -20,7 +21,7 @@ async fn main() -> std::io::Result<()> {
             .service(actix_files::Files::new("static", "./static").show_files_listing())
             .wrap(Logger::default())
     })
-    .bind(("0.0.0.0", 7878))?
+    .bind(format!("0.0.0.0:{}", port))?
     .run()
     .await
 }
