@@ -3,6 +3,7 @@
 A learning exercise to see if I can replace my own blog [JuniorDeveloperDiaries](https://juniordeveloperdiaries.com) which uses netlify and gastby for simple static webhosting, with something that has the bare miniumum of what I need for a blog that has 30-60 monthly readers (aka not a lot).
 
 ## Goals
+
 - Write it in Rust, I think this is a project that's not too hard but not too easy either
 - Similar workflow, writing a new post means a new markdown file in some content directory. Home page, pagination should all work.
 - Write the markdown parser from scratch, no libraries, and convert it to html that looks as bad as https://juniordeveloperdiaries does
@@ -10,7 +11,9 @@ A learning exercise to see if I can replace my own blog [JuniorDeveloperDiaries]
 - Get real analytics, I don't want to pay $14/month or whatever it is for Netlify, and google analytics is particularly poorly suited for a community where 90% of the users probably have a tracking/ad-blocker.
 
 ## Current state
+
 This project's progress will be representative of the bikeseat image below
+
 <p align="center">
-  <img src="musty-bikeseat.jpeg" alt="Musty old bikeseat"/>
+  <img src="ripped-bikeseat.jpeg" alt="Ripped bikeseat"/>
 </p>
